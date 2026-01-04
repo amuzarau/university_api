@@ -16,7 +16,7 @@ env/
 Thumbs.db
 
 # ===== Logs =====
-*.loggit 
+*.log 
 
 # ===== Environment variables =====
 .env
