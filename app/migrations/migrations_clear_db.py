@@ -1,7 +1,14 @@
+"""
+Utility script for clearing database tables.
+"""
+
 from app.migrations.migrations_connection import get_connection
 
 
-def clear_db():
+def clear_db() -> None:
+    """
+    Drop student-related tables from the database.
+    """
     conn = get_connection()
     cursor = conn.cursor()
 

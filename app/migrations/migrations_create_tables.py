@@ -1,7 +1,14 @@
+"""
+Database migration script for creating tables.
+"""
+
 from app.migrations.migrations_connection import get_connection
 
 
-def create_tables():
+def create_tables() -> None:
+    """
+    Create required database tables if they do not exist.
+    """
     conn = get_connection()
     cursor = conn.cursor()
 

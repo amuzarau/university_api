@@ -1,36 +1,68 @@
-from fastapi import HTTPException
-from typing import Union
+"""
+Main FastAPI application module.
 
-from fastapi import FastAPI
+Defines API endpoints for managing students.
+"""
+
+from typing import List, Dict, Any
+
+from fastapi import FastAPI, HTTPException
 
 from app.db import get_db_connection
-from app.models.student import StudentCreate
-from app.models.student import Student
+from app.models.student import StudentCreate, Student
 
-from typing import List
 
+# FastAPI application instance
 app = FastAPI(title="University API")
 
 
 @app.get("/")
-def read_root():
+def read_root() -> Dict[str, str]:
+    """
+    Root endpoint for sanity check.
+
+    Returns:
+        A simple greeting message.
+    """
     return {"Hello": "World"}
 
 
 @app.get("/status")
-async def status():
+async def status() -> Dict[str, str]:
+    """
+    Health check endpoint.
+
+    Returns:
+        Application status message.
+    """
     return {"message": "OK"}
 
 
-@app.post("/student/")
-def create_student(student: StudentCreate):
+@app.post("/student/", response_model=Student)
+def create_student(student: StudentCreate) -> Student:
+    """
+    Create a new student record.
+
+    Args:
+        student: StudentCreate object containing first and last name.
+
+    Returns:
+        The newly created Student object.
+
+    Raises:
+        HTTPException: If database operation fails.
+    """
     conn, cursor = get_db_connection()
     try:
         cursor.execute(
-            "INSERT INTO Students (first_name, last_name) VALUES (%s, %s) RETURNING *",
+            """
+            INSERT INTO Students (first_name, last_name)
+            VALUES (%s, %s)
+            RETURNING *
+            """,
             (student.first_name, student.last_name),
         )
-        new_student = cursor.fetchone()
+        new_student: Dict[str, Any] | None = cursor.fetchone()
         conn.commit()
         cursor.close()
     except Exception as e:
@@ -45,12 +77,21 @@ def create_student(student: StudentCreate):
 
 
 @app.get("/students/", response_model=List[Student])
-def get_all_students():
-    students = []
+def get_all_students() -> List[Student]:
+    """
+    Retrieve all students from the database.
+
+    Returns:
+        List of Student objects.
+
+    Raises:
+        HTTPException: If no students are found or database fails.
+    """
+    students: List[Student] = []
     conn, cursor = get_db_connection()
     try:
         cursor.execute("SELECT * FROM Students")
-        rows = cursor.fetchall()
+        rows: List[Dict[str, Any]] = cursor.fetchall()
         for row in rows:
             students.append(Student(**row))
         cursor.close()
@@ -65,7 +106,16 @@ def get_all_students():
 
 
 @app.delete("/student/{student_id}")
-def delete_student(student_id: int):
+def delete_student(student_id: int) -> Dict[str, str]:
+    """
+    Delete a student by ID.
+
+    Args:
+        student_id: ID of the student to delete.
+
+    Returns:
+        Confirmation message.
+    """
     conn, cursor = get_db_connection()
     try:
         cursor.execute("DELETE FROM Students WHERE id = %s", (student_id,))

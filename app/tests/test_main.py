@@ -1,23 +1,38 @@
+"""
+Integration tests for the FastAPI application.
+"""
+
+from typing import Generator
+
 import pytest
 from fastapi.testclient import TestClient
 from random import randint
+
 from app.main import app
 
 
 @pytest.fixture(scope="module")
-def client():
+def client() -> Generator[TestClient, None, None]:
+    """
+    Test client fixture for FastAPI application.
+    """
     with TestClient(app) as c:
         yield c
 
 
-def test_when_app_running_status_endpoint_should_return_OK(client):
+def test_when_app_running_status_endpoint_should_return_OK(
+    client: TestClient,
+) -> None:
+    """Verify that the status endpoint returns OK."""
     response = client.get("/status")
     assert response.status_code == 200
     data = response.json()
     assert data["message"] == "OK"
 
 
-def test_when_given_user_name_should_create_a_student_in_db(client):
+def test_when_given_user_name_should_create_a_student_in_db(
+    client: TestClient,
+) -> None:
     random = randint(0, 1000)
     first_name = f"John {random}"
     last_name = f"World {random}"
@@ -29,7 +44,9 @@ def test_when_given_user_name_should_create_a_student_in_db(client):
     assert student_id is not None
 
 
-def test_get_all_students_should_return_list_of_students(client):
+def test_get_all_students_should_return_list_of_students(
+    client: TestClient,
+) -> None:
     response = client.get("/students/")
     assert response.status_code == 200
     data = response.json()
@@ -42,7 +59,9 @@ def test_get_all_students_should_return_list_of_students(client):
         assert "last_name" in student
 
 
-def test_delete_student_should_remove_student_from_db(client):
+def test_delete_student_should_remove_student_from_db(
+    client: TestClient,
+) -> None:
     # Create a new student
     random = randint(0, 100000)
     first_name = f"John {random}"
