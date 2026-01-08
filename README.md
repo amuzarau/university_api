@@ -15,7 +15,7 @@ The main goals of this project are:
 * Run the application locally and inside **Docker Compose**
 * Build a minimal **Streamlit** UI as a frontend client
 
-This project follows best practices expected in backend development, namely the Test-Driven Development (TDD), software development approach where you write automated tests before writing the actual code, then implement just enough code to make those tests pass.
+This project follows best practices expected in backend development, namely the **Test-Driven Development (TDD)**, software development approach where you write automated tests before writing the actual code, then implement just enough code to make those tests pass.
 It follows a short cycle of red (failing test) → green (passing test) → refactor, helping ensure correctness, cleaner design, and easier maintenance.
 
 ---
